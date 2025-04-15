@@ -1,2 +1,2 @@
 HELLO FULLSTACK COURSE
-npm create vite@latest partTwoDemo -- --template react
+npm create vite@latest phonebook -- --template react
