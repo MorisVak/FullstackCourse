@@ -24,10 +24,33 @@ const App = () => {
   const addNewPerson = (event) => {
     event.preventDefault();
 
-    if (persons.some((val) => val.name === newName)) {
-      alert(`${newName} is already in the List. Enter a different name!`);
+    if (
+      persons.some((val) => val.name === newName && val.number !== newNumber)
+    ) {
+      const personToUpdateNumber = persons.find((val) => val.name === newName);
+      if (
+        window.confirm(
+          `${personToUpdateNumber.name} is already added to the phonebook, replace the old number with a new one ?`
+        )
+      ) {
+        personToUpdateNumber.number = newNumber;
+        numberService
+          .updateNumber(personToUpdateNumber.id, personToUpdateNumber)
+          .then(() => {
+            setNewFilteredPersons(filteredPersons.filter(() => true));
+            setPersons(persons.filter(() => true));
+          });
+      } else {
+        console.log(`Didnt update number of ${personToUpdateNumber.name}`);
+        setNewName("");
+        setNewNumber("");
+      }
     } else if (newName === "" && newNumber === "") {
       alert("Please enter a name");
+    } else if (
+      persons.some((val) => val.name === newName && val.number === newNumber)
+    ) {
+      alert("Duplicate entry, please change name or number!");
     } else {
       const newPerson = {
         name: newName,
@@ -56,7 +79,7 @@ const App = () => {
     setNewFilteredPersons(filteredPeople);
   };
 
-  const deleteNumber = (log, id, name) => {
+  const deleteNumber = (id, name) => {
     if (window.confirm(`Are you sure you want to delete ${name} ?`)) {
       numberService.deleteNumber(id).then((deletedNote) => {
         setNewFilteredPersons(
@@ -70,9 +93,8 @@ const App = () => {
   };
   const handleDeletion = (id, name) => {
     const windowButton = document.querySelector("#windowButton");
-    const log = document.querySelector("#log");
 
-    windowButton.addEventListener(onclick, deleteNumber(log, id, name));
+    windowButton.addEventListener(onclick, deleteNumber(id, name));
   };
 
   return (
