@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Person from "./components/Person";
 import PersonsForm from "./components/PersonsForm";
 import SearchFilter from "./components/SearchFilter";
+import numberService from "./numbers";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,11 +12,11 @@ const App = () => {
 
   const hook = () => {
     console.log("effect");
-    axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("fullfilled");
-      setPersons(response.data);
-      setNewFilteredPersons(response.data);
+    numberService.getAll().then((initialNumbers) => {
+      setPersons(initialNumbers);
+      setNewFilteredPersons(initialNumbers);
     });
+    console.log("fullfilled");
   };
   //eventHandler to call the hook function
   useEffect(hook, []);
@@ -32,10 +32,11 @@ const App = () => {
       const newPerson = {
         name: newName,
         number: newNumber,
-        id: String(persons.length + 1),
       };
-      setPersons(persons.concat(newPerson));
-      setNewFilteredPersons(filteredPersons.concat(newPerson));
+      numberService.postNumber(newPerson).then((returnedNumber) => {
+        setPersons(persons.concat(returnedNumber));
+        setNewFilteredPersons(filteredPersons.concat(returnedNumber));
+      });
       setNewName("");
       setNewNumber("");
     }
@@ -53,6 +54,25 @@ const App = () => {
       person.name.toLowerCase().includes(filteringFor.toLowerCase())
     );
     setNewFilteredPersons(filteredPeople);
+  };
+
+  const deleteNumber = (log, id, name) => {
+    if (window.confirm(`Are you sure you want to delete ${name} ?`)) {
+      numberService.deleteNumber(id).then((deletedNote) => {
+        setNewFilteredPersons(
+          filteredPersons.filter((person) => person.id !== deletedNote.id)
+        );
+        setPersons(persons.filter((person) => person.id !== deletedNote.id));
+      });
+    } else {
+      console.log("Nope you dont :) ");
+    }
+  };
+  const handleDeletion = (id, name) => {
+    const windowButton = document.querySelector("#windowButton");
+    const log = document.querySelector("#log");
+
+    windowButton.addEventListener(onclick, deleteNumber(log, id, name));
   };
 
   return (
@@ -73,6 +93,7 @@ const App = () => {
           key={filterdPerson.id}
           name={filterdPerson.name}
           number={filterdPerson.number}
+          onDelete={() => handleDeletion(filterdPerson.id, filterdPerson.name)}
         />
       ))}
     </div>
