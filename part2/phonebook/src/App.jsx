@@ -3,20 +3,21 @@ import Person from "./components/Person";
 import PersonsForm from "./components/PersonsForm";
 import SearchFilter from "./components/SearchFilter";
 import numberService from "./numbers";
+import Notification from "./components/notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filteredPersons, setNewFilteredPersons] = useState([]);
+  const [newNotification, setNewNotification] = useState(null);
+  const [newErrorMessage, setNewErrorMessage] = useState(null);
 
   const hook = () => {
-    console.log("effect");
     numberService.getAll().then((initialNumbers) => {
       setPersons(initialNumbers);
       setNewFilteredPersons(initialNumbers);
     });
-    console.log("fullfilled");
   };
   //eventHandler to call the hook function
   useEffect(hook, []);
@@ -39,6 +40,20 @@ const App = () => {
           .then(() => {
             setNewFilteredPersons(filteredPersons.filter(() => true));
             setPersons(persons.filter(() => true));
+            setNewNotification(
+              `${personToUpdateNumber.name}'s number was updated to : ${newNumber}`
+            );
+            setTimeout(() => {
+              setNewNotification(null);
+            }, 5000);
+          })
+          .catch((error) => {
+            setNewErrorMessage(
+              `Informatio of ${personToUpdateNumber.name} has already been removed from server.`
+            );
+            setTimeout(() => {
+              setNewNotification(null);
+            }, 5000);
           });
       } else {
         console.log(`Didnt update number of ${personToUpdateNumber.name}`);
@@ -60,6 +75,12 @@ const App = () => {
         setPersons(persons.concat(returnedNumber));
         setNewFilteredPersons(filteredPersons.concat(returnedNumber));
       });
+      setNewNotification(
+        `${newPerson.name} was added to the phonebook with number : ${newPerson.number}`
+      );
+      setTimeout(() => {
+        setNewNotification(null);
+      }, 5000);
       setNewName("");
       setNewNumber("");
     }
@@ -100,6 +121,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={newNotification} errorMessage={newErrorMessage} />
       <SearchFilter onFiltering={handleFilter} />
       <h2>add a new entry</h2>
       <PersonsForm
