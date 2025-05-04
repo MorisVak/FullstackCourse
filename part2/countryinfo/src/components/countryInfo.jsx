@@ -1,6 +1,7 @@
 import Country from "./country";
+import SpecificInfo from "./specificInfo";
 
-const CountryInfo = ({ filteredCountryList, allCountrys }) => {
+const CountryInfo = ({ filteredCountryList, singleCountry }) => {
   if (filteredCountryList.length > 10) {
     return (
       <div>
@@ -25,14 +26,19 @@ const CountryInfo = ({ filteredCountryList, allCountrys }) => {
       </div>
     );
   }
-  const singularCountryData = allCountrys.filter(
-    (countrys) => countrys.name.common === filteredCountryList[0]
-  );
-  return (
-    <div>
-      <h2>{singularCountryData.name}</h2>
-    </div>
-  );
+  if (singleCountry) {
+    return (
+      <div>
+        <SpecificInfo
+          countryName={singleCountry.name}
+          capital={singleCountry.capital}
+          languages={singleCountry.languages}
+          area={singleCountry.area}
+          flag={singleCountry.flag}
+        />
+      </div>
+    );
+  }
 };
 
 export default CountryInfo;
