@@ -61,6 +61,7 @@ const App = () => {
 
     noteService.create(noteObject).then((returnedNote) => {
       setNotes(notes.concat(returnedNote));
+
       setNewNote("");
     });
   };

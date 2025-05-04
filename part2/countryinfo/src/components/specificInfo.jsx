@@ -1,7 +1,14 @@
-const SpecificInfo = ({ countryName, capital, area, languages, flag }) => {
+const SpecificInfo = ({
+  countryName,
+  capital,
+  area,
+  languages,
+  flag,
+  temp,
+  wind,
+  icon,
+}) => {
   const extractedLanguages = Object.values(languages);
-  console.log(extractedLanguages);
-
   return (
     <div>
       <h2>{countryName}</h2>
@@ -14,6 +21,10 @@ const SpecificInfo = ({ countryName, capital, area, languages, flag }) => {
         ))}
       </ul>
       <img src={flag}></img>
+      <h2>Weather in {capital}</h2>
+      <p>Temperature {temp} Celsius</p>
+      <img src={icon}></img>
+      <p>Wind {wind} m/s</p>
     </div>
   );
 };

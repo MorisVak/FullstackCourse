@@ -1,7 +1,12 @@
 import Country from "./country";
 import SpecificInfo from "./specificInfo";
 
-const CountryInfo = ({ filteredCountryList, singleCountry }) => {
+const CountryInfo = ({
+  filteredCountryList,
+  singleCountry,
+  weatherOfCountry,
+  onClickShowButton,
+}) => {
   if (filteredCountryList.length > 10) {
     return (
       <div>
@@ -21,7 +26,11 @@ const CountryInfo = ({ filteredCountryList, singleCountry }) => {
     return (
       <div>
         {filteredCountryList.map((name) => (
-          <Country key={name} name={name} />
+          <Country
+            key={name}
+            name={name}
+            onClickingShowButton={onClickShowButton}
+          />
         ))}
       </div>
     );
@@ -35,6 +44,9 @@ const CountryInfo = ({ filteredCountryList, singleCountry }) => {
           languages={singleCountry.languages}
           area={singleCountry.area}
           flag={singleCountry.flag}
+          temp={weatherOfCountry.temp}
+          wind={weatherOfCountry.wind}
+          icon={weatherOfCountry.icon}
         />
       </div>
     );

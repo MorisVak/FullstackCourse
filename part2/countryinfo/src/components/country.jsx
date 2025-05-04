@@ -1,7 +1,10 @@
-const Country = ({ name }) => {
+const Country = ({ name, onClickingShowButton }) => {
   return (
     <div>
-      <p>{name}</p>
+      <p>
+        {name}
+        <button onClick={() => onClickingShowButton(name)}> Show</button>
+      </p>
     </div>
   );
 };

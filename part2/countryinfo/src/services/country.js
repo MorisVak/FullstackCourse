@@ -1,4 +1,8 @@
 import axios from "axios";
+
+const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
+console.log(apiKey);
+
 const baseUrl = `https://studies.cs.helsinki.fi/restcountries/api`;
 
 const getAllCountrys = () => {
