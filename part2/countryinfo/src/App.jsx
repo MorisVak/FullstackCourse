@@ -8,9 +8,10 @@ function App() {
   const [countryNameList, newCountryNameList] = useState(null);
   const [filteredCountryNameList, newFilteredNameList] = useState([]);
   const [countryList, newCountryList] = useState([]);
+  const [singleChosenCountry, setNewChosenCountry] = useState(null);
 
   const getCountryHook = () => {
-    countryService.getAllCountryNames().then((allCountrys) => {
+    countryService.getAllCountrys().then((allCountrys) => {
       newCountryList(allCountrys);
       const names = allCountrys.map((countrys) => countrys.name.common);
       newCountryNameList(names);
@@ -28,21 +29,44 @@ function App() {
     newFilteredNameList(filteredCountrys);
     console.log(filteredCountrys.length);
     if (filteredCountrys.length == 1) {
-      const singularCountryData = countryList.filter((countrys) => {
-        return countrys.name.common === filteredCountrys[0];
-      });
+      countryService
+        .getChosenCountry(filteredCountrys[0])
+        .then((pickedCountry) => {
+          const filteredPickedCountry = {
+            name: pickedCountry.name.common,
+            capital: pickedCountry.capital,
+            area: pickedCountry.area,
+            languages: pickedCountry.languages,
+            flag: pickedCountry.flags.png,
+          };
+          console.log(filteredPickedCountry);
+          setNewChosenCountry(filteredPickedCountry);
+          console.log(singleChosenCountry);
+        });
     }
   };
-  return (
-    <div>
-      <h1>Country Info</h1>
-      <SearchForm country={country} onCountryChange={handleCountryChange} />
-      <CountryInfo
-        filteredCountryList={filteredCountryNameList}
-        allCountrys={countryList}
-      />
-    </div>
-  );
+  if (!singleChosenCountry) {
+    return (
+      <div>
+        <h1>Country Info</h1>
+        <SearchForm country={country} onCountryChange={handleCountryChange} />
+        <CountryInfo filteredCountryList={filteredCountryNameList} />
+      </div>
+    );
+  } else {
+    console.log(singleChosenCountry.name);
+
+    return (
+      <div>
+        <h1>Country Info</h1>
+        <SearchForm country={country} onCountryChange={handleCountryChange} />
+        <CountryInfo
+          filteredCountryList={filteredCountryNameList}
+          singleCountry={singleChosenCountry}
+        />
+      </div>
+    );
+  }
 }
 
 export default App;
