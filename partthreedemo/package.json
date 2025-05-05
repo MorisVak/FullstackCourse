@@ -1,0 +1,25 @@
+{
+  "name": "partthreedemo",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/MorisVak/FullstackCourse#readme",
+  "bugs": {
+    "url": "https://github.com/MorisVak/FullstackCourse/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MorisVak/FullstackCourse.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

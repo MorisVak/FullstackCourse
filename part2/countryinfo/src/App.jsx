@@ -16,6 +16,7 @@ function App() {
     countryService.getAllCountrys().then((allCountrys) => {
       newCountryList(allCountrys);
       const names = allCountrys.map((countrys) => countrys.name.common);
+
       newCountryNameList(names);
       newFilteredNameList(names);
       console.log("COUNTRY LIST \n", countryNameList);
@@ -49,6 +50,8 @@ function App() {
   };
 
   const handleCountryChange = (event) => {
+    console.log(event.target.value);
+
     setNewCountry(event.target.value);
     const filteredCountrys = countryNameList.filter((name) =>
       name.toLowerCase().includes(`${event.target.value.toLowerCase()}`)

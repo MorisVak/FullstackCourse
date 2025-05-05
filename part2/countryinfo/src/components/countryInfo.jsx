@@ -35,7 +35,7 @@ const CountryInfo = ({
       </div>
     );
   }
-  if (singleCountry) {
+  if (singleCountry && weatherOfCountry) {
     return (
       <div>
         <SpecificInfo
