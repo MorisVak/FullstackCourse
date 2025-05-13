@@ -1,7 +1,8 @@
 const express = require("express");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
-dotenv.config;
+dotenv.config();
+const PhoneNumber = require("./models/phoneNumber");
 const app = express();
 app.use(express.static("dist"));
 app.use(express.json());
@@ -50,7 +51,9 @@ app.get("/info", (request, response) => {
 });
 
 app.get("/api/persons", (request, response) => {
-  response.json(numbers);
+  PhoneNumber.find({}).then((numbers) => {
+    response.json(numbers);
+  });
 });
 
 app.get("/api/persons/:id", (request, response) => {
@@ -76,20 +79,15 @@ app.post("/api/persons", (request, response) => {
     return response.status(400).json({
       error: "content missing",
     });
-  } else if (numbers.find((number) => number.name === body.name)) {
-    return response.status(400).json({
-      error: "name must be unique",
-    });
   }
-
-  const newNumber = {
-    id: Math.floor(Math.random() * 100000),
+  const newNumber = new PhoneNumber({
     name: body.name,
     number: body.number,
-  };
-
-  numbers = numbers.concat(newNumber);
-  response.json(newNumber);
+  });
+  newNumber.save().then((savedNumber) => {
+    console.log(`Saved ${savedNumber} to Database`);
+    response.json(savedNumber);
+  });
 });
 
 const PORT = process.env.PORT || 3001;
