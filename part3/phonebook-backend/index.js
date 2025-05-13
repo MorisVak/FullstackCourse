@@ -21,56 +21,38 @@ app.use(
   })
 );
 
-let numbers = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
 app.get("/info", (request, response) => {
   const now = new Date();
-  response.send(`<p>Phonebook has info for ${numbers.length} people</p>
+  PhoneNumber.find({}).then((numbers) => {
+    response.send(`<p>Phonebook has info for ${numbers.length} people</p>
     <p>${now.toDateString()} ${now.toTimeString()}</p>`);
+  });
 });
 
-app.get("/api/persons", (request, response) => {
+app.get("/api/persons", (request, response, next) => {
   PhoneNumber.find({}).then((numbers) => {
     response.json(numbers);
   });
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
-  const person = numbers.find((number) => number.id === id);
-  if (person) {
-    response.json(person);
-  } else {
-    response.statusMessage = "Couldn't find Id";
-    response.status(404).end();
-  }
+  PhoneNumber.findById(id)
+    .then((number) => {
+      if (number) {
+        response.json(number);
+      } else {
+        response.statusMessage = "Couldn't find Id";
+        response.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  numbers = numbers.filter((number) => number.id !== id);
-  response.status(204).end();
+app.delete("/api/persons/:id", (request, response, next) => {
+  PhoneNumber.findByIdAndDelete(request.params.id)
+    .then(response.status(204).end())
+    .catch((error) => next(error));
 });
 
 app.post("/api/persons", (request, response) => {
@@ -90,7 +72,46 @@ app.post("/api/persons", (request, response) => {
   });
 });
 
+app.put("/api/persons/:id", (request, response, next) => {
+  console.log("BODY : ", request.body);
+
+  const { name, number } = request.body;
+  PhoneNumber.findByIdAndUpdate(request.params.id)
+    .then((numberToUpdate) => {
+      if (!numberToUpdate) {
+        return response.status(404).end();
+      }
+
+      numberToUpdate.name = name;
+      numberToUpdate.number = number;
+
+      numberToUpdate
+        .save()
+        .then((updatedNumber) => response.json(updatedNumber));
+    })
+    .catch((error) => next(error));
+});
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler);
