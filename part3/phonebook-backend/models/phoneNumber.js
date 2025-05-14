@@ -16,8 +16,22 @@ mongoose
   });
 
 const phoneNumberSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minLength: 3,
+    required: true,
+  },
+  number: {
+    type: String,
+    minLength: 8,
+    required: true,
+    validate: {
+      validator: function (numberToTest) {
+        return /^\d{2,3}-\d+$/.test(numberToTest);
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
+  },
 });
 
 phoneNumberSchema.set("toJSON", {
@@ -27,5 +41,7 @@ phoneNumberSchema.set("toJSON", {
     delete returnedObject.__v;
   },
 });
+
+const opts = { runValidators: true };
 
 module.exports = mongoose.model("PhoneNumber", phoneNumberSchema);

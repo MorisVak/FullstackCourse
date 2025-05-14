@@ -1,11 +1,13 @@
 const express = require("express");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
+const cors = require("cors");
 dotenv.config();
 const PhoneNumber = require("./models/phoneNumber");
 const app = express();
 app.use(express.static("dist"));
 app.use(express.json());
+app.use(cors());
 app.use(
   morgan(function (tokens, req, res) {
     return [
@@ -55,7 +57,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
   if (!body.name || !body.number) {
     return response.status(400).json({
@@ -66,28 +68,30 @@ app.post("/api/persons", (request, response) => {
     name: body.name,
     number: body.number,
   });
-  newNumber.save().then((savedNumber) => {
-    console.log(`Saved ${savedNumber} to Database`);
-    response.json(savedNumber);
-  });
+  newNumber
+    .save()
+    .then((savedNumber) => {
+      console.log(`Saved ${savedNumber} to Database`);
+      response.json(savedNumber);
+    })
+    .catch((error) => next(error));
 });
 
 app.put("/api/persons/:id", (request, response, next) => {
   console.log("BODY : ", request.body);
-
   const { name, number } = request.body;
-  PhoneNumber.findByIdAndUpdate(request.params.id)
-    .then((numberToUpdate) => {
-      if (!numberToUpdate) {
+  //1. id to look for 2. information to update with 3. validation options
+  PhoneNumber.findByIdAndUpdate(
+    request.params.id,
+    { name, number },
+    { new: true, runValidators: true, context: "query" }
+  )
+    .then((updatedNumber) => {
+      if (updatedNumber) {
+        response.json(updatedNumber);
+      } else {
         return response.status(404).end();
       }
-
-      numberToUpdate.name = name;
-      numberToUpdate.number = number;
-
-      numberToUpdate
-        .save()
-        .then((updatedNumber) => response.json(updatedNumber));
     })
     .catch((error) => next(error));
 });
@@ -108,6 +112,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
