@@ -30,7 +30,7 @@ if (process.argv.length === 3) {
     number: process.argv[4],
   });
 
-  newNumber.save().then((result) => {
+  newNumber.save().then(() => {
     console.log(
       `added ${newNumber.name}'s number ${newNumber.number} to the phonebook `
     );

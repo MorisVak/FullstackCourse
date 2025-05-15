@@ -8,7 +8,7 @@ const url = process.env.MONGODB_URI;
 
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => {
     console.log("Conntecting to", url);
   })
   .catch((error) => {
@@ -41,7 +41,5 @@ phoneNumberSchema.set("toJSON", {
     delete returnedObject.__v;
   },
 });
-
-const opts = { runValidators: true };
 
 module.exports = mongoose.model("PhoneNumber", phoneNumberSchema);

@@ -31,7 +31,7 @@ app.get("/info", (request, response) => {
   });
 });
 
-app.get("/api/persons", (request, response, next) => {
+app.get("/api/persons", (request, response) => {
   PhoneNumber.find({}).then((numbers) => {
     response.json(numbers);
   });
@@ -102,7 +102,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
