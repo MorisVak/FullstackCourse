@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Not getting cheesed in sf6 omg!",
+    "author": "Moris M2",
+    "url": "www.some-second-url-ye.de",
+    "likes": 20
+}
